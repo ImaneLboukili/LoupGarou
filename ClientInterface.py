@@ -2,22 +2,30 @@ from Tkinter import *
 import random as rd 
 from Joueur import *
 from socket import *
+import pickle
 
 
 class Partie:
 
-	def __init__(self, personages, nbJoueurs, socket):
+	def __init__(self):
+	
+		#recuperation des donnes de la partie depuis le serveur
+		self.socket = socket(AF_INET, SOCK_STREAM)
+		self.socket.connect(('127.0.0.1',8000))
+		print "Connexion au serveur"
 		
-		#self.user = ""
-		self.chat = ""
-		self.nbJoueurs = nbJoueurs
-		self.players = [Joueur("no one", personages) for i in xrange(0,nbJoueurs)]
-		self.perso = ""
+		data = self.socket.recv(1024)
+	
+		self.nbJoueurs = int(data)
+		#self.players = self.socket.recv(1024)
+		self.personages = pickle.loads(self.socket.recv(1024))
+		
+		print "personages : ", self.personages 
+		print "nombre de joueurs : ", self.nbJoueurs
+		
+		
 		self.root = Tk()
-		self.personages = personages
-		self.cptJoueurs = 0
-		self.socket = socket
-
+		self.chat = ""
 		self.root.title("Loup Garou")
 		s = Label(text ="Bienvenue", font=(('Times'),20))
 		s.grid(row=2,column=0)
@@ -47,33 +55,40 @@ class Partie:
 		self.topvote.destroy()
 		
 	def MAJplayers(self):
+		
+		names = self.socket.recv(1024)
+		self.playersNames = pickle.loads(names)
+		print self.playersNames
 		txt = "Vous jouez actuellement avec : "
-		for player in self.players:
-			txt += "\n"+ player.name
+		for player in self.playersNames:
+			txt += "\n"+ player
 		self.joueursLabel.config(text=txt)
 		
+	#def MAJplayers(self):
+		
 	def Play(self):
-		print "nombre de joueurs : ", self.cptJoueurs
-		if(self.cptJoueurs <self.nbJoueurs):
-			self.players[self.cptJoueurs].name = self.e.get()
-			if(self.cptJoueurs == 0):
-				top=Toplevel()
-				top.title("La partie est lancee.")
-				notiLabel = Label(top, text ="Vous etes un "+self.players[0].perso+".", font=('Times', 20))
-				notiLabel.grid(row=0,column=0, sticky=W)
-					
-				self.joueursLabel = Label(top, text = "", font=('Times', 20))
-				self.MAJplayers()
-				self.joueursLabel.grid(row=1,column=0, sticky=W)
-				
-				vote = Button(top, text="Vote", width =50, command = self.Vote)
-				vote.grid(row=6, column=0)
-				
-				top.mainloop()
-			else:
-				self.MAJplayers()
-				
-			self.cptJoueurs +=1
+		self.socket.sendall(self.e.get())	
+		valid = self.socket.recv(1024)
+		print valid
+		if(valid=="OK"):
+			
+			top=Toplevel()
+			top.title("La partie est lancee.")
+			self.perso = self.socket.recv(1024)
+			notiLabel = Label(top, text ="Vous etes un "+self.perso+".", font=('Times', 20))
+			notiLabel.grid(row=0,column=0, sticky=W)
+			
+			self.joueursLabel = Label(top, text = "", font=('Times', 20))
+			
+			self.joueursLabel.grid(row=1,column=0, sticky=W)
+			self.MAJplayers()
+			vote = Button(top, text="Vote", width =50, command = self.Vote)
+			vote.grid(row=6, column=0)
+			
+			
+		
+			
+			
 		
 		
 		
@@ -105,4 +120,5 @@ class Partie:
 	
 
 
-game = Partie(["Loup garou", "Villageois"], 4)
+game = Partie()
+
