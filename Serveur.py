@@ -1,4 +1,4 @@
-
+from Protocole import *
 import socket
 from Joueur import *
 import pickle
@@ -22,26 +22,33 @@ comSocket.listen(nb_joueurs)
 try:
    #while True:
 	newSocket, address = comSocket.accept()
+	p = Protocole(newSocket, '$')
 	print "Connecte a ", address
 	while True:
 		
+		p.envoi("nb_Joueurs",str(nb_joueurs))
 		
-		newSocket.sendall(str(nb_joueurs))
-		print "envoye"
-		#newSocket.sendall(str(players))
-		newSocket.sendall(pickle.dumps(personages))
+		p.rec("val")
+		
+		p.envoiListe("persos",personages)
+		
+		#newSocket.sendall(pickle.dumps(personages))
 		#print pickle.dumps(personages)
 		
-		nomJoueur1 = newSocket.recv(1024)
+		nomJoueur1 = p.rec("nom")
+		#newSocket.recv(1024)
 		if not nomJoueur1: break
 		if(cptJoueurs <nb_joueurs):
-			players[cptJoueurs].name = nomJoueur1			
-			newSocket.sendall("OK")
+			players[cptJoueurs].name = nomJoueur1
+			p.envoi("valid", "OK")			
+			p.rec("merci")
+			#newSocket.sendall("OK")
 			#permission de continuer si le nombre max de joueur n'est pas atteint
-			
-			newSocket.sendall(players[cptJoueurs].perso)
-			
-			newSocket.sendall(pickle.dumps([player.name for player in players]))
+			p.envoi("pers", players[cptJoueurs].perso)
+			#newSocket.sendall(players[cptJoueurs].perso)
+			p.rec("merci2")
+			p.envoiListe("players", [player.name for player in players])
+			#newSocket.sendall(pickle.dumps([player.name for player in players]))
 			#actualisation de la liste des joueurs
 			cptJoueurs += 1
 			

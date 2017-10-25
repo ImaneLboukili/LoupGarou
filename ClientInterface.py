@@ -3,7 +3,7 @@ import random as rd
 from Joueur import *
 from socket import *
 import pickle
-
+from Protocole import *
 
 class Partie:
 
@@ -14,14 +14,18 @@ class Partie:
 		self.socket.connect(('127.0.0.1',8000))
 		print "Connexion au serveur"
 		
-		data = self.socket.recv(1024)
+		self.p = Protocole(self.socket, '$')
+		
+		#data = self.socket.recv(1024)
 	
-		self.nbJoueurs = int(data)
-		#self.players = self.socket.recv(1024)
-		self.personages = pickle.loads(self.socket.recv(1024))
+		self.nbJoueurs = self.p.rec("nb_Joueurs")
+		print "nombre de joueurs : ", self.nbJoueurs
+		self.p.envoi("val", "OK")
+		self.personages = self.p.recListe("persos")
+		#pickle.loads(self.socket.recv(1024))
 		
 		print "personages : ", self.personages 
-		print "nombre de joueurs : ", self.nbJoueurs
+		
 		
 		
 		self.root = Tk()
@@ -56,8 +60,9 @@ class Partie:
 		
 	def MAJplayers(self):
 		
-		names = self.socket.recv(1024)
-		self.playersNames = pickle.loads(names)
+		self.playersNames = self.p.recListe("players")
+		#self.socket.recv(1024)
+		#self.playersNames = pickle.loads(names)
 		print self.playersNames
 		txt = "Vous jouez actuellement avec : "
 		for player in self.playersNames:
@@ -67,14 +72,19 @@ class Partie:
 	#def MAJplayers(self):
 		
 	def Play(self):
-		self.socket.sendall(self.e.get())	
-		valid = self.socket.recv(1024)
-		print valid
+		self.p.envoi("nom", self.e.get())
+		#self.socket.sendall(self.e.get())	
+		valid = self.p.rec("valid")
+		# self.socket.recv(1024)
+		#print valid
 		if(valid=="OK"):
 			
 			top=Toplevel()
 			top.title("La partie est lancee.")
-			self.perso = self.socket.recv(1024)
+			self.p.envoi("merci", "ok")
+			self.perso = self.p.rec("pers")
+			self.p.envoi("merci2", "ok")
+			#self.socket.recv(1024)
 			notiLabel = Label(top, text ="Vous etes un "+self.perso+".", font=('Times', 20))
 			notiLabel.grid(row=0,column=0, sticky=W)
 			
