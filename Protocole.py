@@ -1,5 +1,8 @@
 class Protocole:
-	 
+	#this class provides methods to send and receive data avoiding buffer issues
+	#we format our data flow as follows : 
+	#ID:data$ID:data$.....	
+	
 	def __init__(self, socket, fin):
 		self.fin = fin
 		self.s = socket
@@ -19,6 +22,7 @@ class Protocole:
 
 	def rec(self, ID):
 		data = self.s.recv(1024)
+		print "recu : ",data
 		data = data.split(':')
 		data = data[data.index(ID)+1]
 		data = data.split(self.fin)[0]
@@ -26,6 +30,7 @@ class Protocole:
 
 	def recListe(self, ID):	
 		d = self.rec(ID)
+		print d
 		return d.split(',')
 		
 	def recGroupe(self, ID):

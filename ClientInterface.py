@@ -15,19 +15,14 @@ class Partie:
 		print "Connexion au serveur"
 		
 		self.p = Protocole(self.socket, '$')
-		
-		#data = self.socket.recv(1024)
-	
 		self.nbJoueurs = self.p.rec("nb_Joueurs")
 		print "nombre de joueurs : ", self.nbJoueurs
+		
 		self.p.envoi("val", "OK")
+		
 		self.personages = self.p.recListe("persos")
-		#pickle.loads(self.socket.recv(1024))
-		
 		print "personages : ", self.personages 
-		
-		
-		
+	
 		self.root = Tk()
 		self.chat = ""
 		self.root.title("Loup Garou")
@@ -53,30 +48,25 @@ class Partie:
 		
 		
 	def die(self):
-		print "****************", self.listusers.curselection()[0]
-		self.players.pop(self.listusers.curselection()[0])
+		self.p.envoi("die", self.listusers.curselection()[0])
+		print "mort envoyee"
+		#self.playersNames.pop(self.listusers.curselection()[0])
 		self.MAJplayers()
 		self.topvote.destroy()
 		
 	def MAJplayers(self):
 		
 		self.playersNames = self.p.recListe("players")
-		#self.socket.recv(1024)
-		#self.playersNames = pickle.loads(names)
 		print self.playersNames
 		txt = "Vous jouez actuellement avec : "
 		for player in self.playersNames:
 			txt += "\n"+ player
 		self.joueursLabel.config(text=txt)
 		
-	#def MAJplayers(self):
 		
 	def Play(self):
 		self.p.envoi("nom", self.e.get())
-		#self.socket.sendall(self.e.get())	
 		valid = self.p.rec("valid")
-		# self.socket.recv(1024)
-		#print valid
 		if(valid=="OK"):
 			
 			top=Toplevel()
@@ -84,7 +74,6 @@ class Partie:
 			self.p.envoi("merci", "ok")
 			self.perso = self.p.rec("pers")
 			self.p.envoi("merci2", "ok")
-			#self.socket.recv(1024)
 			notiLabel = Label(top, text ="Vous etes un "+self.perso+".", font=('Times', 20))
 			notiLabel.grid(row=0,column=0, sticky=W)
 			
@@ -95,17 +84,12 @@ class Partie:
 			vote = Button(top, text="Vote", width =50, command = self.Vote)
 			vote.grid(row=6, column=0)
 			
-			
-		
-			
-			
-		
 		
 		
 	def Vote(self):
 		self.topvote=Toplevel()
 		self.topvote.title("Let's vote...")
-		notiLabel = Label(self.topvote, text ="Qui souhaitez vous tuer, "+self.players[0].name+" ? \nDeliberez en utilisant le chat ci dessous", font=('Times', 20))
+		notiLabel = Label(self.topvote, text ="Qui souhaitez vous tuer, "+self.playersNames[0]+" ? \nDeliberez en utilisant le chat ci dessous", font=('Times', 20))
 		notiLabel.grid(row=0,column=0, sticky=W)
 		
 		self.chatLabel = Label(self.topvote, text ="", font=('Times', 14), height = 20, width = 40, background="white")
@@ -124,8 +108,8 @@ class Partie:
 		ok = Button(self.topvote, text="Ok", width =50, command=self.getchat)
 		ok.grid(row=7, column=0)
 
-		for item in self.players:
-			self.listusers.insert(END, item.name)
+		for item in self.playersNames:
+			self.listusers.insert(END, item)
 
 	
 
