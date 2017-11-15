@@ -10,6 +10,7 @@ class Protocole:
 	def envoi(self, ID, data):
 		envoi = ID +":" + str(data) + self.fin
 		self.s.sendall(envoi)
+		print "envoi : ",envoi
 	
 	def envoiListe(self, ID, data):
 		self.envoi(ID, ','.join(data))

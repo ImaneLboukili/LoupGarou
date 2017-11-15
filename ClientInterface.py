@@ -49,7 +49,7 @@ class Partie:
 		
 	def die(self):
 		self.p.envoi("die", self.listusers.curselection()[0])
-		print "mort envoyee"
+		print "mort envoyee pour ",self.listusers.curselection()[0]
 		#self.playersNames.pop(self.listusers.curselection()[0])
 		self.MAJplayers()
 		self.topvote.destroy()

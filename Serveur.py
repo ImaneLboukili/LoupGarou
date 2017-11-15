@@ -58,7 +58,10 @@ try:
 		
 			#try:
 			d = p.rec("die")
-			players.pop[int(d)]
+			print "on me dit de tuer",d
+			#print players[int(d)]
+			
+			players.pop(int(d))
 			print "j'envoie", [player.name for player in players]
 			p.envoiListe("players", [player.name for player in players])
 		#except:
