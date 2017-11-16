@@ -4,12 +4,15 @@ from Joueur import *
 from socket import *
 import pickle
 from Protocole import *
+import io
 
 class Partie:
 
 	def __init__(self):
 	
 		#recuperation des donnes de la partie depuis le serveur
+		#Nombre de joueurs, persos disponibles...
+		
 		self.socket = socket(AF_INET, SOCK_STREAM)
 		self.socket.connect(('127.0.0.1',8000))
 		print "Connexion au serveur"
@@ -22,7 +25,8 @@ class Partie:
 		
 		self.personages = self.p.recListe("persos")
 		print "personages : ", self.personages 
-	
+		
+		#Creation de l'interface
 		self.root = Tk()
 		self.chat = ""
 		self.root.title("Loup Garou")
@@ -40,52 +44,50 @@ class Partie:
 		play.grid(row=6, column=0)
 		
 		self.root.mainloop()
-		
+	
+	#recupere la valeur d'un message dans le chat, et l'affiche a la suite des autres
 	def getchat(self):
 		self.chat += "\n" +self.players[0].name+" : " + self.field.get()
 		self.chatLabel.config(text=self.chat)
 		self.field.delete(0, 'end')
 		
-		
+	#Tue un joueur et efface son nom de la liste des joueurs de la fenetre de partie
+	#supprime le joueur de la liste dans le serveur
 	def die(self):
 		self.p.envoi("die", self.listusers.curselection()[0])
-		print "mort envoyee pour ",self.listusers.curselection()[0]
-		#self.playersNames.pop(self.listusers.curselection()[0])
 		self.MAJplayers()
 		self.topvote.destroy()
-		
+	
+	#Met a jour la liste des joueurs de la fenetre de partie
 	def MAJplayers(self):
-		
 		self.playersNames = self.p.recListe("players")
 		print self.playersNames
 		txt = "Vous jouez actuellement avec : "
 		for player in self.playersNames:
 			txt += "\n"+ player
 		self.joueursLabel.config(text=txt)
-		
-		
+	
+	#Lance la fenetre de la partie
 	def Play(self):
 		self.p.envoi("nom", self.e.get())
 		valid = self.p.rec("valid")
+		#si le serveur dit que le client peut joueur
 		if(valid=="OK"):
-			
 			top=Toplevel()
 			top.title("La partie est lancee.")
 			self.p.envoi("merci", "ok")
+			#le serveur envoie au client la liste des autres persos
 			self.perso = self.p.rec("pers")
 			self.p.envoi("merci2", "ok")
 			notiLabel = Label(top, text ="Vous etes un "+self.perso+".", font=('Times', 20))
 			notiLabel.grid(row=0,column=0, sticky=W)
-			
 			self.joueursLabel = Label(top, text = "", font=('Times', 20))
-			
 			self.joueursLabel.grid(row=1,column=0, sticky=W)
 			self.MAJplayers()
 			vote = Button(top, text="Vote", width =50, command = self.Vote)
 			vote.grid(row=6, column=0)
 			
-		
-		
+	#ouvre une fenetre de deliberation chez les clients pour designer le mort du jour	
 	def Vote(self):
 		self.topvote=Toplevel()
 		self.topvote.title("Let's vote...")
@@ -110,9 +112,6 @@ class Partie:
 
 		for item in self.playersNames:
 			self.listusers.insert(END, item)
-
-	
-
 
 game = Partie()
 
