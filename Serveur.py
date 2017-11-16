@@ -11,6 +11,7 @@ players = [Joueur("no one", personages) for i in xrange(0,nb_joueurs)]
 cptJoueurs = 0
 
 
+
 #ouverture de la communication
 comSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 comSocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -50,7 +51,7 @@ try:
 			players.pop(int(d))
 			print "j'envoie", [player.name for player in players]
 			p.envoiListe("players", [player.name for player in players])
-			if(len(
+			#if(len(
 
 		
 	newSocket.close()

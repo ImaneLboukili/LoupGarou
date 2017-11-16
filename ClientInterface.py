@@ -4,7 +4,8 @@ from Joueur import *
 from socket import *
 import pickle
 from Protocole import *
-import io
+
+complet = open("complet.txt", 'r')
 
 class Partie:
 
@@ -73,6 +74,22 @@ class Partie:
 		valid = self.p.rec("valid")
 		#si le serveur dit que le client peut joueur
 		if(valid=="OK"):
+			
+			
+			'''complet = 0
+			while (complet ==0):
+				complet = int(rec("feuvert"))'''
+				
+			wait=Toplevel()
+			wait.title("La partie est lancee.")
+			notiLabel = Label(wait, text ="Nous attendons les autres participants", font=('Times', 20))
+			notiLabel.grid(row=0,column=0, sticky=W)
+			comp = 0
+			while ('1' not in complet.read()):
+				comp = 0
+				
+			wait.destroy()
+			
 			top=Toplevel()
 			top.title("La partie est lancee.")
 			self.p.envoi("merci", "ok")
