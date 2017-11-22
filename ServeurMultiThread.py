@@ -46,7 +46,7 @@ def partie_thread():
 			p.envoiListe("players", [player.name for player in players])
 			#actualisation de la liste des joueurs
 			cptJoueurs += 1
-		else:
+		if(cptJoueurs==nbJoueurs):
 			comp = 1
 			complet.write(str(comp))
 

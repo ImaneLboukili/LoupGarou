@@ -11,6 +11,7 @@ class Protocole:
 		envoi = ID +":" + str(data) + self.fin
 		self.s.sendall(envoi)
 		print "envoi : ",envoi
+
 	
 	def envoiListe(self, ID, data):
 		self.envoi(ID, ','.join(data))
@@ -25,13 +26,29 @@ class Protocole:
 		data = self.s.recv(1024)
 		print "recu : ",data
 		data = data.split(':')
+		if(ID in data):
+			data = data[data.index(ID)+1]
+			data = data.split(self.fin)[0]
+			return data
+		else:
+			print "L'identifiant ", ID, " n'etait pas present dans l'echange"
+			
+	def recvall(self, ID):
+		total_data=[]
+		while True:
+			data = self.s.recv(1024)
+			print "recu all : ",data
+			if not data: break
+			total_data.append(data)
+		data = ''.join(total_data)
+		data = data.split(':')
 		data = data[data.index(ID)+1]
 		data = data.split(self.fin)[0]
 		return data
 
 	def recListe(self, ID):	
 		d = self.rec(ID)
-		print d
+		print "liste recue : ",d
 		return d.split(',')
 		
 	def recGroupe(self, ID):
