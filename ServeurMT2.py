@@ -42,10 +42,6 @@ def creation_partie():
 	p.envoi("pers", players[cptJoueurs].perso)
 	p.rec("merci")
 	cptJoueurs += 1
-	#finally:
-		#comSocket.close()
-		
-	
 	
 	
 def partie():	
@@ -73,18 +69,19 @@ for joueur in xrange(0,nb_joueurs):
 	thread.start()
 	threads.append(thread)
 
-print "j'ai tous les joueurs"
+
 
 for t in threads:
 	t.join()
-print "j'ai joint"
-complet.write('1')
-complet.close()
+
+for t in threads:
+	("complet","ok")
 
 threads = []
+
 for joueur in xrange(0,nb_joueurs):
 	thread=threading.Thread(target=partie)
 	thread.start()
 	threads.append(thread)
-	time.sleep(2)
+	#time.sleep(2)
 

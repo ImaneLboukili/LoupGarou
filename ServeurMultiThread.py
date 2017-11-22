@@ -31,8 +31,7 @@ def partie_thread():
 		p.rec("val")
 		p.envoiListe("persos",personages)
 		nomJoueur1 = p.rec("nom")
-		comp = 0
-		complet.write(str(comp))
+
 		
 		#si le nombre de joueurs max n'est pas atteint
 		if(cptJoueurs <=nb_joueurs):
@@ -40,12 +39,16 @@ def partie_thread():
 			players[cptJoueurs].name = nomJoueur1
 			p.envoi("valid", "OK")	
 			p.rec("merci")
+			cptJoueurs += 1
+			
+			if(cpt
+			
 			#permission de continuer si le nombre max de joueur n'est pas atteint
 			p.envoi("pers", players[cptJoueurs].perso)
 			p.rec("merci2")
 			p.envoiListe("players", [player.name for player in players])
 			#actualisation de la liste des joueurs
-			cptJoueurs += 1
+			
 		if(cptJoueurs==nbJoueurs):
 			comp = 1
 			complet.write(str(comp))

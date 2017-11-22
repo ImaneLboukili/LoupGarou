@@ -19,7 +19,7 @@ class Partie:
 		
 		self.socket = socket
 		print "Connexion au serveur"
-		self.socket.settimeout(20)
+		#self.socket.settimeout(20)
 		self.p = Protocole(self.socket, '$')
 		self.nbJoueurs = self.p.rec("nb_Joueurs")
 		print "nombre de joueurs : ", self.nbJoueurs
@@ -74,21 +74,22 @@ class Partie:
 		
 	#Lance la fenetre de la partie
 	def Play(self):
+
 		self.N['text'] = "Nous attendons les autres participants"
 		self.p.envoi("nom", self.e.get())
-		time.sleep(2)
+		#time.sleep(2)
 		pe = self.p.rec("pers")
 		self.perso = pe
 		self.p.envoi("merci", "ok")
-		
 		wait=Toplevel()
 		wait.title("Attente")
 		notiLabel = Label(wait, text ="Nous attendons les autres participants", font=('Times', 20))
 		notiLabel.grid(row=0,column=0, sticky=W)	
-		print "je suis sense attendre"
-		while('1' not in complet.read()):
-			#print 'k'
-			comp = 0
+		ok = ''
+		while True:
+			ok = p.recv(1024)
+			if ok == "ok":break
+		
 		wait.destroy()
 		top=Toplevel()
 		top.title("La partie est lancee.")
