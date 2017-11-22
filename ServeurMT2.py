@@ -3,14 +3,17 @@ from Joueur import *
 import time
 import socket
 import threading
+import sys
+
+
 
 #initialisation de la partie
-nb_joueurs = 2
+
+nb_joueurs = int(sys.argv[1])
 personages = ["Loup garou", "Villageois"]
 players = [Joueur("no one", personages) for i in xrange(0,nb_joueurs)]
 cptJoueurs = 0
 threads = []
-complet=open('complet.txt','w')
 
 #ouverture de la communication
 comSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -18,65 +21,61 @@ comSocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 comSocket.bind(('',8000))
 comSocket.listen(nb_joueurs)
 
-adresses = []
-
+print "En attente de connexion"
 
 def partie():
 
 	global cptJoueurs
-
 	#ecoute des clients
-	#try:
 	newSocket, address = comSocket.accept()
-	adresses.append(address)
-	print adresses
-	
-	#newSocket.settimeout(10)
-	
-	
 	p = Protocole(newSocket, '$')
 	print "Connecte a ", address	
+	
+	#Envoie les informations relatives a la partie au joueur
 	p.envoi("nb_Joueurs",str(nb_joueurs))	
 	p.rec("val")
 	p.envoiListe("persos",personages)
-	nomJoueur = p.rec("nom")
 	
+	#Recupere le nom du joueur
+	nomJoueur = p.rec("nom")
 	players[cptJoueurs].name = nomJoueur
-	print players[cptJoueurs].perso
-	#p.envoi("valid", "OK")	
-	#p.rec("merci")
-	#permission de continuer si le nombre max de joueur n'est pas atteint
 	p.envoi("pers", players[cptJoueurs].perso)
 	p.rec("merci")
 	cptJoueurs += 1
-
-	(cptJoueurs == nb_joueurs):
-		newSocket.send("1")
+	
+	#Attent que tous les joueurs ait rejoint la partie
+	if(cptJoueurs < nb_joueurs):
+		while True:
+			if(cptJoueurs == nb_joueurs):break
+	
+	newSocket.send("go")
+	newSocket.recv(1024)
 		
-		#actualisation de la liste des joueurs
+	#envoi de la liste complete des joueurs
+	p.envoiListe("players", [player.name for player in players])
+		
+	#attend que des gens soient tues
+	while True :	
+		#try:
+		d = p.rec("die")
+		players.pop(int(d))
+		#print "j'envoie", [player.name for player in players]
 		p.envoiListe("players", [player.name for player in players])
-			
-		#attend que des gens soient tues
-		while True :	
-			#try:
-			d = p.rec("die")
-			players.pop(int(d))
-			#print "j'envoie", [player.name for player in players]
-			p.envoiListe("players", [player.name for player in players])
 
+		
+	newSocket.close()
+	print "Fin de connection avec ", address
 			
-		newSocket.close()
-		print "Fin de connection avec ", address
-				
-		#finally:
-		comSocket.close()
+	#finally:
+	comSocket.close()
 
+
+#Lancement de toutes les parties en parallele
 for joueur in xrange(0,nb_joueurs):
 	
 	thread=threading.Thread(target=partie)
 	thread.start()
 	threads.append(thread)
-	if(cptJoueurs==nb_joueurs):
 		
 
 
