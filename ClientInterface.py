@@ -81,16 +81,17 @@ class Partie:
 		pe = self.p.rec("pers")
 		self.perso = pe
 		self.p.envoi("merci", "ok")
-		wait=Toplevel()
-		wait.title("Attente")
-		notiLabel = Label(wait, text ="Nous attendons les autres participants", font=('Times', 20))
-		notiLabel.grid(row=0,column=0, sticky=W)	
-		ok = ''
-		while True:
-			ok = p.recv(1024)
-			if ok == "ok":break
+		#wait=Toplevel()
+		#wait.title("Attente")
+		#notiLabel = Label(wait, text ="Nous attendons les autres participants", font=('Times', 20))
+		#notiLabel.grid(row=0,column=0, sticky=W)		
+		#wait.destroy()
 		
-		wait.destroy()
+		complet = 0
+		while True:
+			complet = int(self.socket.recv(1024))
+			if(complet==1):break
+			
 		top=Toplevel()
 		top.title("La partie est lancee.")
 		#self.p.envoi("merci", "ok")
@@ -100,7 +101,7 @@ class Partie:
 		notiLabel.grid(row=0,column=0, sticky=W)
 		self.joueursLabel = Label(top, text = "", font=('Times', 20))
 		self.joueursLabel.grid(row=1,column=0, sticky=W)
-		self.MAJplayers()
+		#self.MAJplayers()
 		vote = Button(top, text="Vote", width =50, command = self.Vote)
 		vote.grid(row=6, column=0)
 		

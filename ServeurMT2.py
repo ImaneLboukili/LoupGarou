@@ -18,15 +18,22 @@ comSocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 comSocket.bind(('',8000))
 comSocket.listen(nb_joueurs)
 
-def creation_partie():
+adresses = []
+
+
+def partie():
 
 	global cptJoueurs
 
 	#ecoute des clients
 	#try:
 	newSocket, address = comSocket.accept()
+	adresses.append(address)
+	print adresses
+	
 	#newSocket.settimeout(10)
-	global p
+	
+	
 	p = Protocole(newSocket, '$')
 	print "Connecte a ", address	
 	p.envoi("nb_Joueurs",str(nb_joueurs))	
@@ -42,46 +49,35 @@ def creation_partie():
 	p.envoi("pers", players[cptJoueurs].perso)
 	p.rec("merci")
 	cptJoueurs += 1
-	
-	
-def partie():	
-	
-	#actualisation de la liste des joueurs
-	p.envoiListe("players", [player.name for player in players])
+
+	(cptJoueurs == nb_joueurs):
+		newSocket.send("1")
 		
-	#attend que des gens soient tues
-	while True :	
-		#try:
-		d = p.rec("die")
-		players.pop(int(d))
-		#print "j'envoie", [player.name for player in players]
+		#actualisation de la liste des joueurs
 		p.envoiListe("players", [player.name for player in players])
-
-		
-	newSocket.close()
-	print "Fin de connection avec ", address
 			
-	#finally:
-	comSocket.close()
+		#attend que des gens soient tues
+		while True :	
+			#try:
+			d = p.rec("die")
+			players.pop(int(d))
+			#print "j'envoie", [player.name for player in players]
+			p.envoiListe("players", [player.name for player in players])
+
+			
+		newSocket.close()
+		print "Fin de connection avec ", address
+				
+		#finally:
+		comSocket.close()
 
 for joueur in xrange(0,nb_joueurs):
-	thread=threading.Thread(target=creation_partie)
-	thread.start()
-	threads.append(thread)
-
-
-
-for t in threads:
-	t.join()
-
-for t in threads:
-	("complet","ok")
-
-threads = []
-
-for joueur in xrange(0,nb_joueurs):
+	
 	thread=threading.Thread(target=partie)
 	thread.start()
 	threads.append(thread)
-	#time.sleep(2)
+	if(cptJoueurs==nb_joueurs):
+		
+
+
 
