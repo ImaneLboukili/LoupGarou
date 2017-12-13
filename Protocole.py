@@ -32,6 +32,7 @@ class Protocole:
 			return data
 		else:
 			print "L'identifiant ", ID, " n'etait pas present dans l'echange"
+			return '_'
 			
 	def recvall(self, ID):
 		total_data=[]

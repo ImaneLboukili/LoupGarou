@@ -2,8 +2,8 @@ import random as rd
 
 class Joueur :
 	
-	def __init__(self, name, personages):
+	def __init__(self, name, personage):
 		
 		self.name = name
-		self.perso = rd.sample(personages,1)[0]
+		self.perso = personage
 		self.state = "vivant"
